@@ -1796,6 +1796,38 @@ abstract class NestGenericTypeShouldBeCastedRecursively {
   '''
     final value = _result.data == null
         ? null
+        : GenericUser<GenericUser<GenericUser<GenericUser<User>?>>?>.fromJson(
+            _result.data!,
+            (json) => json == null
+                ? null
+                : GenericUser<GenericUser<GenericUser<User>?>>.fromJson(
+                    json as Map<String, dynamic>,
+                    (json) => GenericUser<GenericUser<User>?>.fromJson(
+                      json as Map<String, dynamic>,
+                      (json) => json == null
+                          ? null
+                          : GenericUser<User>.fromJson(
+                              json as Map<String, dynamic>,
+                              (json) =>
+                                  User.fromJson(json as Map<String, dynamic>),
+                            ),
+                    ),
+                  ),
+          );
+    return value;
+  ''',
+  contains: true,
+)
+@RestApi()
+abstract class NullableNestGenericTypeShouldBeCastedRecursively {
+  @PUT('/')
+  Future<GenericUser<GenericUser<GenericUser<GenericUser<User>?>>?>?> get();
+}
+
+@ShouldGenerate(
+  '''
+    final value = _result.data == null
+        ? null
         : GenericUser<User>.fromJson(
             _result.data!,
             (json) => User.fromJson(json as Map<String, dynamic>),

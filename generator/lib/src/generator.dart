@@ -909,10 +909,7 @@ You should create a new class to encapsulate the response.
               if (typeArgs.isNotEmpty && genericArgumentFactories) {
                 //Remove the outermost nullable modifier
                 //see NullableDynamicNullableInnerGenericTypeShouldBeCastedAsMap from generator/test/src/generator_test_src.dart:1529
-                var displayString = _displayString(
-                  returnType,
-                  withNullability: innerReturnType?.isNullable ?? false,
-                );
+                var displayString = _displayString(returnType, withNullability: true);
                 displayString = displayString.endsWith('?')
                     ? displayString.substring(0, displayString.length - 1)
                     : displayString;
@@ -1087,12 +1084,17 @@ You should create a new class to encapsulate the response.
                 _typeChecker(BuiltList).isExactlyType(arg)) {
               mappedVal += _getInnerJsonSerializableMapperFn(arg);
             } else {
+              var displayString = _displayString(arg, withNullability: true);
+              displayString = displayString.endsWith('?')
+                  ? displayString.substring(0, displayString.length - 1)
+                  : displayString;
+              
               if (isGenericArgumentFactories(arg)) {
                 mappedVal +=
-                    '(json)=>${_displayString(arg)}.fromJson(json as Map<String, dynamic>,${_getInnerJsonSerializableMapperFn(arg)}),';
+                    '(json)=>${arg.isNullable?'json == null ? null : ':''}$displayString.fromJson(json as Map<String, dynamic>,${_getInnerJsonSerializableMapperFn(arg)}),';
               } else {
                 mappedVal +=
-                    '(json)=>${_displayString(arg)}.fromJson(json as Map<String, dynamic>),';
+                    '(json)=>${arg.isNullable?'json == null ? null : ':''}$displayString.fromJson(json as Map<String, dynamic>),';
               }
             }
           } else {
